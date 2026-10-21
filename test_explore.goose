@@ -1,7 +1,7 @@
 // Unit test: Collatz Explorer (recursive)
 // Checks that the explorer finds the number with the most steps.
 
-fn collatz_steps(n: i64) -> i64 {
+recursive fn collatz_steps(n: i64) -> i64 {
     if n == 1 { return 0; }
     if n % 2 == 0 {
         return 1 + collatz_steps(n / 2);
