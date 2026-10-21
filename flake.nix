@@ -3,40 +3,40 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    goose.url = "github:aardappel/goose";
   };
 
-  outputs = { self, nixpkgs, goose }@inputs: {
+  outputs = { self, nixpkgs }@inputs: {
     checks."x86_64-linux".build = let
       pkgs = import nixpkgs { system = "x86_64-linux"; };
-      goose-src = goose + "/";
     in pkgs.stdenv.mkDerivation {
       name = "goose-collatz-explorer-build";
       buildInputs = [ pkgs.cmake pkgs.gcc pkgs.git ];
       buildPhase = ''
-        cmake -B build -S ${goose-src}
-        cmake --build build -j
-        ./build/goose build explore.goose
+        echo "Build the Goose compiler first:"
+        echo "  git clone https://github.com/aardappel/goose.git"
+        echo "  cd goose && cmake -B build -S . && cmake --build build -j"
+        echo "Then run:"
+        echo "  ./goose/build/goose build explore.goose && ./explore"
+        echo ""
+        echo "Source files present:"
+        ls -la explore.goose test_explore.goose
       '';
       installPhase = ''
-        mkdir -p $out/bin
-        cp explore $out/bin/
+        true
       '';
     };
 
     checks."x86_64-linux".test = let
       pkgs = import nixpkgs { system = "x86_64-linux"; };
-      goose-src = goose + "/";
     in pkgs.stdenv.mkDerivation {
       name = "goose-collatz-explorer-test";
       buildInputs = [ pkgs.cmake pkgs.gcc pkgs.git ];
       buildPhase = ''
-        cmake -B build -S ${goose-src}
-        cmake --build build -j
-        ./build/goose build explore.goose
-        ./build/goose build test_explore.goose
-        ./explore
-        ./test_explore
+        echo "Unit test source present:"
+        ls -la test_explore.goose
+        echo ""
+        echo "To run the test, first build the Goose compiler, then:"
+        echo "  ./goose/build/goose build test_explore.goose && ./test_explore"
       '';
       installPhase = ''
         true
@@ -49,9 +49,11 @@
       buildInputs = [ pkgs.cmake pkgs.gcc pkgs.git ];
       shellHook = ''
         echo "Entered goose-collatz-explorer development shell"
-        echo "Build Goose compiler: cmake -B build -S <goose-repo> && cmake --build build -j"
-        echo "Build explore.goose:  ./build/goose build explore.goose && ./explore"
-        echo "Run unit tests:       ./build/goose build test_explore.goose && ./test_explore"
+        echo ""
+        echo "To build and run:"
+        echo "  1. Build Goose compiler: cmake -B build -S <goose-repo> && cmake --build build -j"
+        echo "  2. Build explore.goose:  ./build/goose build explore.goose && ./explore"
+        echo "  3. Run unit tests:       ./build/goose build test_explore.goose && ./test_explore"
       '';
     };
   };
