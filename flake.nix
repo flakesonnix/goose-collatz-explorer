@@ -16,18 +16,30 @@
     } ''
       export HOME=$(mktemp -d)
       cp -r $src/* .
-      # Build the Goose compiler from source (fetched as Flake input)
       cmake -B build -S ${goose}
       cmake --build build -j
-      # Build the Goose programs
       ./build/goose build explore.goose
       ./build/goose build test_explore.goose
       mkdir -p $out/bin
       cp explore $out/bin/
       cp test_explore $out/bin/
-      # Run tests
       ./explore
       ./test_explore
+    '';
+
+    packages.x86_64-linux.default = pkgs.runCommand "goose-collatz-explorer-bin" {
+      src = ./.;
+      buildInputs = [ pkgs.cmake pkgs.gcc ];
+    } ''
+      export HOME=$(mktemp -d)
+      cp -r $src/* .
+      cmake -B build -S ${goose}
+      cmake --build build -j
+      ./build/goose build explore.goose
+      ./build/goose build test_explore.goose
+      mkdir -p $out/bin
+      cp explore $out/bin/
+      cp test_explore $out/bin/
     '';
   };
 }
